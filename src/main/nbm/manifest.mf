@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+AutoUpdate-Show-In-Client: true
+OpenIDE-Module-Name: ESLint
+OpenIDE-Module-Display-Category: ADITO / ESLint
+OpenIDE-Module-Short-Description: ESLint Integration for ADITO Designer
+OpenIDE-Module-Long-Description: Integrates an static code analysis support based on ESLint
