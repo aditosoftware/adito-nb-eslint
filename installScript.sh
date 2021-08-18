@@ -12,20 +12,20 @@
 
 # name of the jar file to be moved. Example of the git plugin:
 # jarFile="de-adito-git-adito-nbm-git.jar"
-jarFile="de-adito-aditoweb-nbm-eslint.jar"
+jarFile=""
 # path to the jar file above, from the location of this script. Example of the git plugin (Note that the git plugin builds the nbm in a submodule,
 # path probably starts with target/...):
 # jarPath="nbm/target/nbm/netbeans/extra/modules/"
-jarPath="target/nbm/netbeans/extra/modules/"
+jarPath=""
 # the path to the folder in which the jar should be moved. Example of the git plugin:
 # jarTargetPath="../0.0/workingdir/nbp_userdir/modules/"
-jarTargetPath="../20210/workingdir/nbp_userdir/modules/"
+jarTargetPath=""
 # name of the folder that contains the gathered dependencies of the plugin. These have to be moved as well. Example of the git plugin:
 # folderName="de.adito.git.adito-nbm-git/"
-folderName="de.adito.aditoweb.nbm.eslint"
+folderName=""
 # path to the folder containing the gathered dependencies, as seen from the location of the script. Example of the git plugin:
 # folderPath="nbm/target/nbm/netbeans/extra/modules/ext/"
-folderPath="target/nbm/netbeans/extra/modules/ext/"
+folderPath=""
 
 if test -z "$jarFile" || test -z "$jarPath" || test -z "$jarTargetPath" || test -z "$folderName" || test -z "$folderPath"
 then
@@ -38,9 +38,10 @@ jarFileTargetPath=$jarTargetPath$jarFile
 folderNamePath=$folderPath$folderName
 folderTargetPath=$jarTargetPath$targetPathFolder
 
-JAVA_HOME="C:/Users/s.seemann/.jdks/adopt-openjdk-13.0.2" "C:\Users\s.seemann\AppData\Local\JetBrains\IntelliJ IDEA Community Edition 2020.2.3\plugins\maven\lib\maven3\bin\mvn" clean install -T 1C -P adito.m2
+JAVA_HOME="C:/Program Files/Java/open_jdk-13" mvn clean install -T 1C -P adito.m2
 
 cp $jarFilePath $jarFileTargetPath
 cp -r $folderNamePath $folderTargetPath
 
 fi
+
