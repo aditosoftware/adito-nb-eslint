@@ -39,7 +39,8 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
     try
     {
       executor.executeAsync(nodeJsEnv, _getExecBase(), outputWriter, null,
-                            null, FileUtil.toFile(pFo).getAbsolutePath());
+                            null, FileUtil.toFile(pFo).getAbsolutePath())
+          .whenComplete((pInt, pThrowable) -> output.getOut().println(NbBundle.getMessage(ESLintExecutorFacadeImpl.class, "LBL_OUTPUT_FINISHED")));
     }
     catch (IOException pE)
     {
@@ -54,7 +55,8 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
     try
     {
       executor.executeAsync(nodeJsEnv, _getExecBase(), outputWriter, null,
-                            null, "--fix", FileUtil.toFile(pFo).getAbsolutePath());
+                            null, "--fix", FileUtil.toFile(pFo).getAbsolutePath())
+          .whenComplete((pInt, pThrowable) -> output.getOut().println(NbBundle.getMessage(ESLintExecutorFacadeImpl.class, "LBL_OUTPUT_FINISHED")));
     }
     catch (IOException pE)
     {
