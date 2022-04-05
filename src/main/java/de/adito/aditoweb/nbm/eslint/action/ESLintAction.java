@@ -36,7 +36,7 @@ public abstract class ESLintAction extends SystemAction implements ContextAwareA
   @Override
   public boolean isEnabled()
   {
-    return super.isEnabled() && fo != null && fo.getExt().endsWith("js");
+    return super.isEnabled() && fo != null && (fo.getExt().endsWith("js") || fo.getExt().endsWith("ts"));
   }
 
   @Override

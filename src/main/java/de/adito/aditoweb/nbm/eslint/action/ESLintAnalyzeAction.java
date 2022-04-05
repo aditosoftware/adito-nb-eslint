@@ -2,7 +2,6 @@ package de.adito.aditoweb.nbm.eslint.action;
 
 import de.adito.aditoweb.nbm.eslint.api.IESLintExecutorFacade;
 import org.jetbrains.annotations.NotNull;
-import org.openide.awt.*;
 import org.openide.filesystems.FileObject;
 
 /**
@@ -10,8 +9,8 @@ import org.openide.filesystems.FileObject;
  *
  * @author s.seemann, 16.08.2021
  */
-@ActionID(category = "adito/eslint", id = "de.adito.aditoweb.nbm.eslint.action.ESLintAnalyzeAction")
-@ActionRegistration(displayName = "ESLintAnalyzeAction")
+//@ActionID(category = "adito/eslint", id = "de.adito.aditoweb.nbm.eslint.action.ESLintAnalyzeAction")
+//@ActionRegistration(displayName = "ESLintAnalyzeAction")
 public class ESLintAnalyzeAction extends ESLintAction
 {
   @Override
@@ -23,6 +22,6 @@ public class ESLintAnalyzeAction extends ESLintAction
   @Override
   public void actionPerformed(@NotNull FileObject pFo)
   {
-    IESLintExecutorFacade.INSTANCE.esLintAnalyze(pFo);
+    IESLintExecutorFacade.getInstance().esLintAnalyze(pFo);
   }
 }

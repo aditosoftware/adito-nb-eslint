@@ -17,12 +17,12 @@ public class ESLintFixAction extends ESLintAction
   @Override
   public String getName()
   {
-    return "ESLint Fix";
+    return "ESLint Format";
   }
 
   @Override
   public void actionPerformed(@NotNull FileObject pFo)
   {
-    IESLintExecutorFacade.INSTANCE.esLintFix(pFo);
+    IESLintExecutorFacade.getInstance().esLintFix(pFo);
   }
 }

@@ -10,7 +10,7 @@ import org.openide.filesystems.*;
 import org.openide.util.*;
 import org.openide.windows.*;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -21,7 +21,7 @@ import java.nio.charset.StandardCharsets;
 public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
 {
   private final InputOutput output = IOProvider.getDefault().getIO("ESLint", false);
-  private final WriterOutputStream outputWriter;
+  private final OutputStream outputWriter;
 
   private INodeJSEnvironment nodeJsEnv;
   private INodeJSExecutor executor;
@@ -40,7 +40,18 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
     {
       executor.executeAsync(nodeJsEnv, _getExecBase(), outputWriter, null,
                             null, FileUtil.toFile(pFo).getAbsolutePath())
-          .whenComplete((pInt, pThrowable) -> output.getOut().println(NbBundle.getMessage(ESLintExecutorFacadeImpl.class, "LBL_OUTPUT_FINISHED")));
+          .whenComplete((pInt, pThrowable) -> {
+            output.getOut().println(NbBundle.getMessage(ESLintExecutorFacadeImpl.class, "LBL_OUTPUT_FINISHED"));
+            try
+            {
+              outputWriter.close();
+            }
+            catch (IOException pE)
+            {
+              // TODO
+              pE.printStackTrace();
+            }
+          });
     }
     catch (IOException pE)
     {

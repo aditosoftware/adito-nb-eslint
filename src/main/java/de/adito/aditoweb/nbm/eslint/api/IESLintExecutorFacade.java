@@ -11,7 +11,12 @@ import org.openide.filesystems.FileObject;
  */
 public interface IESLintExecutorFacade
 {
-  IESLintExecutorFacade INSTANCE = new ESLintExecutorFacadeImpl();
+  //IESLintExecutorFacade INSTANCE = new ESLintExecutorFacadeImpl();
+
+  static IESLintExecutorFacade getInstance()
+  {
+    return new ESLintExecutorFacadeImpl();
+  }
 
   /**
    * Executes the ESLint command

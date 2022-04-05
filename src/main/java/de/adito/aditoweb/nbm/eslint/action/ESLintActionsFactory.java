@@ -1,7 +1,7 @@
 package de.adito.aditoweb.nbm.eslint.action;
 
 import org.jetbrains.annotations.NotNull;
-import org.netbeans.core.windows.actions.*;
+import org.netbeans.core.windows.actions.ActionsFactory;
 import org.openide.util.actions.SystemAction;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.windows.*;
@@ -26,7 +26,7 @@ public class ESLintActionsFactory extends ActionsFactory
 
     List<Action> actions = new ArrayList<>(Arrays.asList(defaultActions));
     actions.add(null);
-    actions.add(SystemAction.get(ESLintAnalyzeAction.class).createContextAwareInstance(tc.getLookup()));
+    //actions.add(SystemAction.get(ESLintAnalyzeAction.class).createContextAwareInstance(tc.getLookup()));
     actions.add(SystemAction.get(ESLintFixAction.class).createContextAwareInstance(tc.getLookup()));
 
     return actions.toArray(new Action[0]);
