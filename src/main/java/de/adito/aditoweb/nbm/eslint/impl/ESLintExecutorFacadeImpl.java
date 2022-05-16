@@ -1,17 +1,16 @@
 package de.adito.aditoweb.nbm.eslint.impl;
 
+import com.google.gson.Gson;
 import de.adito.aditoweb.nbm.eslint.api.IESLintExecutorFacade;
 import de.adito.aditoweb.nbm.nbide.nbaditointerface.javascript.node.*;
 import de.adito.notification.INotificationFacade;
-import org.apache.commons.io.output.WriterOutputStream;
 import org.jetbrains.annotations.NotNull;
+import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.project.*;
 import org.openide.filesystems.*;
-import org.openide.util.*;
-import org.openide.windows.*;
+import org.openide.util.BaseUtilities;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Implementation of {@link IESLintExecutorFacade}
@@ -20,16 +19,9 @@ import java.nio.charset.StandardCharsets;
  */
 public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
 {
-  private final InputOutput output = IOProvider.getDefault().getIO("ESLint", false);
-  private final OutputStream outputWriter;
-
   private INodeJSEnvironment nodeJsEnv;
   private INodeJSExecutor executor;
-
-  public ESLintExecutorFacadeImpl()
-  {
-    outputWriter = new WriterOutputStream(output.getOut(), StandardCharsets.UTF_8, 128, true);
-  }
+  private ProgressHandle handle;
 
 
   @Override
@@ -38,20 +30,22 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
     _setup(pFo);
     try
     {
-      executor.executeAsync(nodeJsEnv, _getExecBase(), outputWriter, null,
-                            null, FileUtil.toFile(pFo).getAbsolutePath())
-          .whenComplete((pInt, pThrowable) -> {
-            output.getOut().println(NbBundle.getMessage(ESLintExecutorFacadeImpl.class, "LBL_OUTPUT_FINISHED"));
-            try
-            {
-              outputWriter.close();
-            }
-            catch (IOException pE)
-            {
-              // TODO
-              pE.printStackTrace();
-            }
-          });
+      ByteArrayOutputStream output = new ByteArrayOutputStream();
+      executor.executeAsync(nodeJsEnv, _getExecBase(), output, null, null, FileUtil.toFile(pFo).getAbsolutePath(), "--format=json")
+          .whenComplete(((pInteger, pThrowable) -> {
+            if (pThrowable != null)
+              return;
+
+            // the first line is the command, this line should be removed
+            String result = output.toString().split("\n")[1];
+            Gson gson = new Gson();
+
+            ESLintResult[] esLintResult = gson.fromJson(result, ESLintResult[].class);
+            new ESLintErrorDescriptionProvider()
+                .publishErrors(esLintResult[0], pFo);
+
+            _cleanup();
+          }));
     }
     catch (IOException pE)
     {
@@ -65,9 +59,9 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
     _setup(pFo);
     try
     {
-      executor.executeAsync(nodeJsEnv, _getExecBase(), outputWriter, null,
+      executor.executeAsync(nodeJsEnv, _getExecBase(), new ByteArrayOutputStream(), null,
                             null, "--fix", FileUtil.toFile(pFo).getAbsolutePath())
-          .whenComplete((pInt, pThrowable) -> output.getOut().println(NbBundle.getMessage(ESLintExecutorFacadeImpl.class, "LBL_OUTPUT_FINISHED")));
+          .whenComplete((pInteger, pThrowable) -> esLintAnalyze(pFo));
     }
     catch (IOException pE)
     {
@@ -77,6 +71,13 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
 
   private void _setup(@NotNull FileObject pFo)
   {
+    if (handle == null)
+    {
+      handle = ProgressHandle.createHandle("Executing ESLint");
+      handle.start();
+      handle.switchToIndeterminate();
+    }
+    SaveUtil.saveUnsavedStates();
     Project project = FileOwnerQuery.getOwner(pFo);
     if (project == null)
       throw new IllegalStateException("No project found");
@@ -89,17 +90,16 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
       throw new IllegalStateException("No NodeJS found");
 
     nodeJsEnv = provider.current().blockingFirst().get(); // NOSONAR the check is in the if above
+  }
 
-    try
+  private void _cleanup()
+  {
+    if (handle != null)
     {
-      output.getOut().reset();
+      handle.finish();
+      handle.close();
+      handle = null;
     }
-    catch (IOException pE)
-    {
-      INotificationFacade.INSTANCE.error(pE);
-    }
-    output.select();
-    output.getOut().println(NbBundle.getMessage(ESLintExecutorFacadeImpl.class, "LBL_OUTPUT_STARTING"));
   }
 
   @NotNull
