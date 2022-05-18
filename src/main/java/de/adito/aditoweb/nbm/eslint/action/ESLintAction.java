@@ -52,6 +52,12 @@ public abstract class ESLintAction extends SystemAction implements ContextAwareA
       actionPerformed(fo);
   }
 
+  @Override
+  public String iconResource()
+  {
+    return super.iconResource();
+  }
+
   /**
    * Performs the action
    *
