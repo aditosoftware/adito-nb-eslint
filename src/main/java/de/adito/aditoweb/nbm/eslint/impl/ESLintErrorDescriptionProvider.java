@@ -10,19 +10,44 @@ import org.openide.filesystems.FileObject;
 import javax.swing.text.Document;
 import java.beans.PropertyChangeListener;
 import java.util.*;
+import java.util.logging.*;
 
 /**
  * @author s.seemann, 12.05.2022
  */
 public class ESLintErrorDescriptionProvider
 {
+  private static final ESLintErrorDescriptionProvider INSTANCE = new ESLintErrorDescriptionProvider();
+  private final Map<String, CacheValue> cache = new HashMap<>();
+
+  private ESLintErrorDescriptionProvider()
+  {
+  }
+
+  public static ESLintErrorDescriptionProvider getInstance()
+  {
+    return INSTANCE;
+  }
+
+  /**
+   * Publish errors if they are contained in cache
+   *
+   * @param pFo the corresponding fileobject
+   */
+  public void publishExistingErrors(@NotNull FileObject pFo)
+  {
+    CacheValue val = cache.get(pFo.getPath());
+    if (val != null && pFo.lastModified().getTime() == val.getLastModified())
+      publishErrors(val.getResult(), pFo);
+  }
+
+
   public void publishErrors(@NotNull ESLintResult pResult, @NotNull FileObject pFileObject)
   {
     EditorCookie ec = pFileObject.getLookup().lookup(EditorCookie.class);
     Document doc = ec != null ? ec.getDocument() : null;
     if (doc == null)
     {
-      // TODO: analyze why is this null?
       INotificationFacade.INSTANCE.notify("ESLint: Could not find document", "ESLint: Could not find document", true, null);
       return; //ignore...
     }
@@ -31,17 +56,33 @@ public class ESLintErrorDescriptionProvider
 
     Arrays.stream(pResult.getMessages())
         .map(pMessage -> {
-          List<Fix> fixes = createFixes(pMessage, pFileObject);
+          if (pMessage.isFatal())
+          {
+            Logger.getLogger(ESLintErrorDescriptionProvider.class.getName()).log(Level.INFO, () -> "ESLint: Skipping following hint, because it is fatal: " + pMessage);
+            return null;
+          }
 
-          Severity severity = Severity.ERROR;
-          if (pMessage.getSeverity() == 1)
-            severity = Severity.WARNING;
+          try
+          {
+            List<Fix> fixes = createFixes(pMessage, pFileObject);
 
-          return ErrorDescriptionFactory.createErrorDescription(pMessage.getRuleId(), severity, "ESLint: " + pMessage.getMessage(), null,
-                                                                new StaticFixList(fixes), doc, pMessage.getLine());
+            Severity severity = Severity.ERROR;
+            if (pMessage.getSeverity() == 1)
+              severity = Severity.WARNING;
+
+            return ErrorDescriptionFactory.createErrorDescription(pMessage.getRuleId(), severity, "ESLint: " + pMessage.getMessage(), null,
+                                                                  new StaticFixList(fixes), doc, pMessage.getLine());
+          }
+          catch (Exception e)
+          {
+            INotificationFacade.INSTANCE.error(e);
+            return null;
+          }
         })
+        .filter(Objects::nonNull)
         .forEach(allErrors::add);
 
+    cache.put(pFileObject.getPath(), new CacheValue(pFileObject.lastModified().getTime(), pResult));
     HintsController.setErrors(doc, getClass().getName(), allErrors);
   }
 
@@ -92,8 +133,8 @@ public class ESLintErrorDescriptionProvider
       //      doc.remove(rangeStart, rangeEnd - rangeStart);
       //      doc.insertString(rangeStart, fix.getText(), null);
       //
-      //      // TODO: If something has changed (e. g. text inserted), the offsets are invalid
-      //      // TODO: what should happen?
+      //      // If something has changed (e. g. text inserted), the offsets are invalid
+      //      // what should happen?
       //      return null;
       //    }
       //  });
@@ -134,4 +175,27 @@ public class ESLintErrorDescriptionProvider
     {
     }
   }
+
+  private static class CacheValue
+  {
+    private final long lastModified;
+    private final ESLintResult result;
+
+    public CacheValue(long pLastModified, @NotNull ESLintResult pResult)
+    {
+      lastModified = pLastModified;
+      result = pResult;
+    }
+
+    public ESLintResult getResult()
+    {
+      return result;
+    }
+
+    public long getLastModified()
+    {
+      return lastModified;
+    }
+  }
+
 }

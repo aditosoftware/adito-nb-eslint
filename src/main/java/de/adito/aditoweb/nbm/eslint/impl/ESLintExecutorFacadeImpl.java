@@ -10,7 +10,8 @@ import org.netbeans.api.project.*;
 import org.openide.filesystems.*;
 import org.openide.util.BaseUtilities;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.util.logging.*;
 
 /**
  * Implementation of {@link IESLintExecutorFacade}
@@ -19,6 +20,7 @@ import java.io.*;
  */
 public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
 {
+  private static final Logger LOGGER = Logger.getLogger(ESLintExecutorFacadeImpl.class.getName());
   private INodeJSEnvironment nodeJsEnv;
   private INodeJSExecutor executor;
   private ProgressHandle handle;
@@ -27,6 +29,7 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
   @Override
   public void esLintAnalyze(@NotNull FileObject pFo)
   {
+    LOGGER.log(Level.INFO, () -> "ESLint Analyzing " + pFo.getPath());
     _setup(pFo);
     try
     {
@@ -34,38 +37,54 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
       executor.executeAsync(nodeJsEnv, _getExecBase(), output, null, null, FileUtil.toFile(pFo).getAbsolutePath(), "--format=json")
           .whenComplete(((pInteger, pThrowable) -> {
             if (pThrowable != null)
+            {
+              INotificationFacade.INSTANCE.error(pThrowable);
+              _cleanup();
               return;
+            }
 
             // the first line is the command, this line should be removed
             String result = output.toString().split("\n")[1];
             Gson gson = new Gson();
 
             ESLintResult[] esLintResult = gson.fromJson(result, ESLintResult[].class);
-            new ESLintErrorDescriptionProvider()
-                .publishErrors(esLintResult[0], pFo);
-
+            if (esLintResult != null)
+            {
+              ESLintErrorDescriptionProvider.getInstance().publishErrors(esLintResult[0], pFo);
+            }
             _cleanup();
           }));
     }
-    catch (IOException pE)
+    catch (Exception pE)
     {
       INotificationFacade.INSTANCE.error(pE);
+      _cleanup();
     }
   }
 
   @Override
   public void esLintFix(@NotNull FileObject pFo)
   {
+    LOGGER.log(Level.INFO, () -> "ESLint Fixing " + pFo.getPath());
     _setup(pFo);
     try
     {
       executor.executeAsync(nodeJsEnv, _getExecBase(), new ByteArrayOutputStream(), null,
                             null, "--fix", FileUtil.toFile(pFo).getAbsolutePath())
-          .whenComplete((pInteger, pThrowable) -> esLintAnalyze(pFo));
+          .whenCompleteAsync((pInteger, pThrowable) -> {
+            if (pThrowable != null)
+            {
+              INotificationFacade.INSTANCE.error(pThrowable);
+              _cleanup();
+              return;
+            }
+            esLintAnalyze(pFo);
+          });
     }
-    catch (IOException pE)
+    catch (Exception pE)
     {
       INotificationFacade.INSTANCE.error(pE);
+      _cleanup();
     }
   }
 
