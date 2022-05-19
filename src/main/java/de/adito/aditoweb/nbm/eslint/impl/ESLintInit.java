@@ -8,9 +8,9 @@ import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
 import org.openide.modules.OnStart;
 import org.openide.util.*;
-import org.openide.windows.TopComponent;
+import org.openide.windows.*;
 
-import javax.swing.*;
+import java.awt.*;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -70,7 +70,7 @@ public class ESLintInit implements Runnable
         {
           FileObject fo = ((TopComponent) evt.getNewValue()).getLookup().lookup(FileObject.class);
           if (fo != null && canAnalyze(fo))
-            SwingUtilities.invokeLater(() -> ESLintErrorDescriptionProvider.getInstance().publishExistingErrors(fo));
+            EventQueue.invokeLater(() -> WindowManager.getDefault().invokeWhenUIReady(() -> ESLintErrorDescriptionProvider.getInstance().publishExistingErrors(fo)));
         }
         catch (Exception e)
         {

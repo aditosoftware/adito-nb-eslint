@@ -43,16 +43,22 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
               return;
             }
 
-            // the first line is the command, this line should be removed
-            String result = output.toString().split("\n")[1];
-            Gson gson = new Gson();
-
-            ESLintResult[] esLintResult = gson.fromJson(result, ESLintResult[].class);
-            if (esLintResult != null)
+            try
             {
-              ESLintErrorDescriptionProvider.getInstance().publishErrors(esLintResult[0], pFo);
+              // the first line is the command, this line should be removed
+              String result = output.toString().split("\n")[1];
+              Gson gson = new Gson();
+
+              ESLintResult[] esLintResult = gson.fromJson(result, ESLintResult[].class);
+              if (esLintResult != null)
+              {
+                ESLintErrorDescriptionProvider.getInstance().publishErrors(esLintResult[0], pFo);
+              }
             }
-            _cleanup();
+            finally
+            {
+              _cleanup();
+            }
           }));
     }
     catch (Exception pE)

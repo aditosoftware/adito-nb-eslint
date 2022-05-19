@@ -1,12 +1,14 @@
 package de.adito.aditoweb.nbm.eslint.impl;
 
+import java.io.Serializable;
+
 /**
  * Model-Class for JSON-Output of ESLint
  *
  * @author s.seemann, 12.05.2022
  */
 @SuppressWarnings("unused") // Filled by GSON
-public class ESLintResult
+public class ESLintResult implements Serializable
 {
   private String filePath;
   private Message[] messages;
@@ -27,7 +29,7 @@ public class ESLintResult
   }
 
   @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
-  public static class Message
+  public static class Message implements Serializable
   {
     private String ruleId;
     private int severity;
@@ -102,7 +104,7 @@ public class ESLintResult
   }
 
   @SuppressWarnings("MismatchedReadAndWriteOfArray")
-  public static class Fix
+  public static class Fix implements Serializable
   {
     private int[] range;
     private String text;

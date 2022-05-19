@@ -1,14 +1,17 @@
 package de.adito.aditoweb.nbm.eslint.impl;
 
 import de.adito.aditoweb.nbm.eslint.api.IESLintExecutorFacade;
+import de.adito.aditoweb.nbm.nbide.nbaditointerface.cache.*;
 import de.adito.notification.INotificationFacade;
 import org.jetbrains.annotations.NotNull;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
+import org.openide.util.Lookup;
 
 import javax.swing.text.Document;
 import java.beans.PropertyChangeListener;
+import java.io.Serializable;
 import java.util.*;
 import java.util.logging.*;
 
@@ -18,10 +21,12 @@ import java.util.logging.*;
 public class ESLintErrorDescriptionProvider
 {
   private static final ESLintErrorDescriptionProvider INSTANCE = new ESLintErrorDescriptionProvider();
-  private final Map<String, CacheValue> cache = new HashMap<>();
+  private final ICache cache;
 
   private ESLintErrorDescriptionProvider()
   {
+    cache = Lookup.getDefault().lookup(ICacheProvider.class).get(ESLintErrorDescriptionProvider.class, ESLintErrorDescriptionProvider.class.getName(),
+                                                                 16 * 1024, 256 * 1024);
   }
 
   public static ESLintErrorDescriptionProvider getInstance()
@@ -36,9 +41,12 @@ public class ESLintErrorDescriptionProvider
    */
   public void publishExistingErrors(@NotNull FileObject pFo)
   {
-    CacheValue val = cache.get(pFo.getPath());
-    if (val != null && pFo.lastModified().getTime() == val.getLastModified())
-      publishErrors(val.getResult(), pFo);
+    if (cache.has(pFo.getPath()))
+    {
+      CacheValue val = (CacheValue) cache.get(pFo.getPath());
+      if (val != null && pFo.lastModified().getTime() == val.getLastModified())
+        publishErrors(val.getResult(), pFo);
+    }
   }
 
 
@@ -176,7 +184,7 @@ public class ESLintErrorDescriptionProvider
     }
   }
 
-  private static class CacheValue
+  private static class CacheValue implements Serializable
   {
     private final long lastModified;
     private final ESLintResult result;
