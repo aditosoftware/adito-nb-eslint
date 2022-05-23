@@ -49,7 +49,12 @@ public class ESLintErrorDescriptionProvider
     }
   }
 
-
+  /**
+   * Publishes the result to the editor
+   *
+   * @param pResult     the ESLint analyzing result
+   * @param pFileObject the corresponding fileobject
+   */
   public void publishErrors(@NotNull ESLintResult pResult, @NotNull FileObject pFileObject)
   {
     EditorCookie ec = pFileObject.getLookup().lookup(EditorCookie.class);

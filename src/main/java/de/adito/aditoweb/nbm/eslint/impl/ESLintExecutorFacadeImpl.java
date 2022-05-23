@@ -10,8 +10,11 @@ import org.netbeans.api.project.*;
 import org.openide.filesystems.*;
 import org.openide.util.BaseUtilities;
 
-import java.io.ByteArrayOutputStream;
+import java.io.*;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.*;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of {@link IESLintExecutorFacade}
@@ -25,35 +28,59 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
   private INodeJSExecutor executor;
   private ProgressHandle handle;
 
-
   @Override
   public void esLintAnalyze(@NotNull FileObject pFo)
   {
-    LOGGER.log(Level.INFO, () -> "ESLint Analyzing " + pFo.getPath());
-    _setup(pFo);
+    esLintAnalyze(List.of(FileUtil.toFile(pFo)))
+        .whenComplete((pESLintResults, pThrowable) -> {
+          if (pThrowable != null)
+          {
+            INotificationFacade.INSTANCE.error(pThrowable);
+            _cleanup();
+            return;
+          }
+
+          try
+          {
+            // publish errors to document
+            if (pESLintResults != null)
+            {
+              ESLintErrorDescriptionProvider.getInstance().publishErrors(pESLintResults[0], pFo);
+            }
+          }
+          finally
+          {
+            _cleanup();
+          }
+        });
+  }
+
+  @Override
+  @NotNull
+  public CompletableFuture<ESLintResult[]> esLintAnalyze(@NotNull List<File> pFiles)
+  {
+    LOGGER.log(Level.INFO, () -> "ESLint Analyzing " + pFiles.stream()
+        .map(File::getAbsolutePath)
+        .collect(Collectors.joining(", ")));
+
     try
     {
-      ByteArrayOutputStream output = new ByteArrayOutputStream();
-      executor.executeAsync(nodeJsEnv, _getExecBase(), output, null, null, FileUtil.toFile(pFo).getAbsolutePath(), "--format=json")
-          .whenComplete(((pInteger, pThrowable) -> {
-            if (pThrowable != null)
-            {
-              INotificationFacade.INSTANCE.error(pThrowable);
-              _cleanup();
-              return;
-            }
+      _setup(pFiles);
 
+      ByteArrayOutputStream output = new ByteArrayOutputStream();
+      List<String> params = pFiles.stream()
+          .map(File::getAbsolutePath)
+          .collect(Collectors.toList());
+      params.add(0, "--format=json");
+      return executor.executeAsync(nodeJsEnv, _getExecBase(), output, null, null, params.toArray(new String[0]))
+          .thenApplyAsync(((pInteger) -> {
             try
             {
               // the first line is the command, this line should be removed
               String result = output.toString().split("\n")[1];
               Gson gson = new Gson();
 
-              ESLintResult[] esLintResult = gson.fromJson(result, ESLintResult[].class);
-              if (esLintResult != null)
-              {
-                ESLintErrorDescriptionProvider.getInstance().publishErrors(esLintResult[0], pFo);
-              }
+              return gson.fromJson(result, ESLintResult[].class);
             }
             finally
             {
@@ -66,25 +93,45 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
       INotificationFacade.INSTANCE.error(pE);
       _cleanup();
     }
+    return CompletableFuture.completedFuture(new ESLintResult[0]);
   }
 
   @Override
   public void esLintFix(@NotNull FileObject pFo)
   {
-    LOGGER.log(Level.INFO, () -> "ESLint Fixing " + pFo.getPath());
-    _setup(pFo);
+    esLintFix(List.of(FileUtil.toFile(pFo)))
+        .whenComplete((pInteger, pThrowable) -> {
+          if (pThrowable != null)
+          {
+            INotificationFacade.INSTANCE.error(pThrowable);
+            _cleanup();
+            return;
+          }
+          esLintAnalyze(pFo);
+        });
+  }
+
+  @Override
+  @NotNull
+  public CompletableFuture<Integer> esLintFix(@NotNull List<File> pFiles)
+  {
+    LOGGER.log(Level.INFO, () -> "ESLint Fixing " + pFiles.stream()
+        .map(File::getAbsolutePath)
+        .collect(Collectors.joining(", ")));
+
     try
     {
-      executor.executeAsync(nodeJsEnv, _getExecBase(), new ByteArrayOutputStream(), null,
-                            null, "--fix", FileUtil.toFile(pFo).getAbsolutePath())
-          .whenCompleteAsync((pInteger, pThrowable) -> {
-            if (pThrowable != null)
-            {
-              INotificationFacade.INSTANCE.error(pThrowable);
-              _cleanup();
-              return;
-            }
-            esLintAnalyze(pFo);
+      _setup(pFiles);
+
+      List<String> params = pFiles.stream()
+          .map(File::getAbsolutePath)
+          .collect(Collectors.toList());
+      params.add(0, "--fix");
+      return executor.executeAsync(nodeJsEnv, _getExecBase(), new ByteArrayOutputStream(), null,
+                                   null, params.toArray(new String[0]))
+          .thenApplyAsync(pInteger -> {
+            _cleanup();
+            return pInteger;
           });
     }
     catch (Exception pE)
@@ -92,9 +139,10 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
       INotificationFacade.INSTANCE.error(pE);
       _cleanup();
     }
+    return CompletableFuture.completedFuture(-1);
   }
 
-  private void _setup(@NotNull FileObject pFo)
+  private void _setup(@NotNull List<File> pFiles)
   {
     if (handle == null)
     {
@@ -103,7 +151,15 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
       handle.switchToIndeterminate();
     }
     SaveUtil.saveUnsavedStates();
-    Project project = FileOwnerQuery.getOwner(pFo);
+
+    // find project
+    Project project = null;
+    for (File file : pFiles)
+    {
+      project = FileOwnerQuery.getOwner(FileUtil.toFileObject(file));
+      if (project != null)
+        break;
+    }
     if (project == null)
       throw new IllegalStateException("No project found");
 
