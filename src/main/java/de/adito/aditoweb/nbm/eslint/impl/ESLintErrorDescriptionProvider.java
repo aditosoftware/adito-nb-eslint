@@ -1,5 +1,6 @@
 package de.adito.aditoweb.nbm.eslint.impl;
 
+import com.google.gson.Gson;
 import de.adito.aditoweb.nbm.eslint.api.IESLintExecutorFacade;
 import de.adito.aditoweb.nbm.nbide.nbaditointerface.cache.*;
 import de.adito.notification.INotificationFacade;
@@ -11,7 +12,6 @@ import org.openide.util.Lookup;
 
 import javax.swing.text.Document;
 import java.beans.PropertyChangeListener;
-import java.io.Serializable;
 import java.util.*;
 import java.util.logging.*;
 
@@ -43,9 +43,14 @@ public class ESLintErrorDescriptionProvider
   {
     if (cache.has(pFo.getPath()))
     {
-      CacheValue val = (CacheValue) cache.get(pFo.getPath());
-      if (val != null && pFo.lastModified().getTime() == val.getLastModified())
-        publishErrors(val.getResult(), pFo);
+      String val = (String) cache.get(pFo.getPath());
+
+      if (val != null)
+      {
+        String[] split = val.split("\\|", 2);
+        if (pFo.lastModified().getTime() == Long.parseLong(split[0]))
+          publishErrors(new Gson().fromJson(split[1], ESLintResult.class), pFo);
+      }
     }
   }
 
@@ -95,7 +100,7 @@ public class ESLintErrorDescriptionProvider
         .filter(Objects::nonNull)
         .forEach(allErrors::add);
 
-    cache.put(pFileObject.getPath(), new CacheValue(pFileObject.lastModified().getTime(), pResult));
+    cache.put(pFileObject.getPath(), pFileObject.lastModified().getTime() + "|" + new Gson().toJson(pResult));
     HintsController.setErrors(doc, getClass().getName(), allErrors);
   }
 
@@ -188,27 +193,4 @@ public class ESLintErrorDescriptionProvider
     {
     }
   }
-
-  private static class CacheValue implements Serializable
-  {
-    private final long lastModified;
-    private final ESLintResult result;
-
-    public CacheValue(long pLastModified, @NotNull ESLintResult pResult)
-    {
-      lastModified = pLastModified;
-      result = pResult;
-    }
-
-    public ESLintResult getResult()
-    {
-      return result;
-    }
-
-    public long getLastModified()
-    {
-      return lastModified;
-    }
-  }
-
 }

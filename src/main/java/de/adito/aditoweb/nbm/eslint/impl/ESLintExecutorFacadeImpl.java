@@ -48,6 +48,10 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
               ESLintErrorDescriptionProvider.getInstance().publishErrors(pESLintResults[0], pFo);
             }
           }
+          catch (Exception e)
+          {
+            INotificationFacade.INSTANCE.error(e);
+          }
           finally
           {
             _cleanup();
