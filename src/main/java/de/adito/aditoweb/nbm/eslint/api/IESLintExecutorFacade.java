@@ -1,7 +1,7 @@
 package de.adito.aditoweb.nbm.eslint.api;
 
 import de.adito.aditoweb.nbm.eslint.impl.*;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.*;
 import org.openide.filesystems.FileObject;
 
 import java.io.File;
@@ -44,6 +44,14 @@ public interface IESLintExecutorFacade
    * @param pFo the FileObject, which should be fixed
    */
   void esLintFix(@NotNull FileObject pFo);
+
+  /**
+   * Executes the ESLint --fix command
+   *
+   * @param pFo the FileObject, which should be fixed
+   * @param pExecuteAfterFix Runnable that will be executed after the fixes are applied
+   */
+  void esLintFix(@NotNull FileObject pFo, @Nullable Runnable pExecuteAfterFix);
 
   /**
    * Executes the ESLint --fix command

@@ -7,6 +7,7 @@ import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
 
 import javax.swing.*;
+import javax.swing.text.JTextComponent;
 
 /**
  * Action for ESLint Fix
@@ -19,10 +20,11 @@ import javax.swing.*;
     @ActionReference(path = "Plugins/ESLint/Actions", position = 200)
 })
 @ActionID(category = "adito/eslint", id = "de.adito.aditoweb.nbm.eslint.action.ESLintFixAction")
-@ActionRegistration(displayName = "#LBL_ESLintFixAllAction")
+@ActionRegistration(displayName = "#LBL_ESLintFixAllAction", iconBase = "de/adito/aditoweb/nbm/eslint/action/paintbrush.png")
 @NbBundle.Messages({"LBL_ESLintFixAllActionTooltip=ESLint: Fix All", "LBL_ESLintFixAllAction=Fix All"})
 public class ESLintFixAllAction extends ESLintAction
 {
+
   public ESLintFixAllAction()
   {
     putValue(Action.SHORT_DESCRIPTION, NbBundle.getMessage(ESLintAnalyzeAction.class, "LBL_ESLintFixAllActionTooltip"));
@@ -35,14 +37,11 @@ public class ESLintFixAllAction extends ESLintAction
   }
 
   @Override
-  public String getName()
+  public void actionPerformed(@NotNull JTextComponent pTextComponent, @NotNull FileObject pFo)
   {
-    return NbBundle.getMessage(ESLintFixAllAction.class, "LBL_ESLintFixAllAction");
-  }
-
-  @Override
-  public void actionPerformed(@NotNull FileObject pFo)
-  {
+    //int caretPos = Optional.ofNullable(textComponent).map(JTextComponent::getCaret).map(Caret::getDot).orElse(0);
+    //IESLintExecutorFacade.getInstance().esLintFix(pFo, () -> SwingUtilities.invokeLater(
+    //    () -> Optional.ofNullable(textComponent).map(JTextComponent::getCaret).ifPresent(pCaret -> pCaret.setDot(caretPos))));
     IESLintExecutorFacade.getInstance().esLintFix(pFo);
   }
 }

@@ -1,12 +1,13 @@
 package de.adito.aditoweb.nbm.eslint.action;
 
 import de.adito.aditoweb.nbm.eslint.api.IESLintExecutorFacade;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.*;
 import org.openide.awt.*;
 import org.openide.filesystems.FileObject;
-import org.openide.util.NbBundle;
+import org.openide.util.*;
 
 import javax.swing.*;
+import javax.swing.text.JTextComponent;
 
 /**
  * Action for ESLint Analyze
@@ -19,7 +20,7 @@ import javax.swing.*;
     @ActionReference(path = "Plugins/ESLint/Actions", position = 100)
 })
 @ActionID(category = "adito/eslint", id = "de.adito.aditoweb.nbm.eslint.action.ESLintAnalyzeAction")
-@ActionRegistration(displayName = "#LBL_ESLintAnalyzeAction")
+@ActionRegistration(displayName = "#LBL_ESLintAnalyzeAction", iconBase = "de/adito/aditoweb/nbm/eslint/action/glasses.png")
 @NbBundle.Messages({"LBL_ESLintAnalyzeActionTooltip=ESLint: Analyze", "LBL_ESLintAnalyzeAction=Analyze"})
 public class ESLintAnalyzeAction extends ESLintAction
 {
@@ -35,13 +36,7 @@ public class ESLintAnalyzeAction extends ESLintAction
   }
 
   @Override
-  public String getName()
-  {
-    return NbBundle.getMessage(ESLintAnalyzeAction.class, "LBL_ESLintAnalyzeAction");
-  }
-
-  @Override
-  public void actionPerformed(@NotNull FileObject pFo)
+  public void actionPerformed(@NotNull JTextComponent pTextComponent, @NotNull FileObject pFo)
   {
     IESLintExecutorFacade.getInstance().esLintAnalyze(pFo);
   }

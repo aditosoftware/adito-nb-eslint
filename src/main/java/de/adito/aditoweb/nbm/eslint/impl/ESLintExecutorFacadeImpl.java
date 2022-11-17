@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import de.adito.aditoweb.nbm.eslint.api.IESLintExecutorFacade;
 import de.adito.aditoweb.nbm.nbide.nbaditointerface.javascript.node.*;
 import de.adito.notification.INotificationFacade;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.*;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.project.*;
 import org.openide.filesystems.*;
@@ -103,6 +103,12 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
   @Override
   public void esLintFix(@NotNull FileObject pFo)
   {
+    esLintFix(pFo, null);
+  }
+
+  @Override
+  public void esLintFix(@NotNull FileObject pFo, @Nullable Runnable pExecuteAfterFix)
+  {
     esLintFix(List.of(FileUtil.toFile(pFo)))
         .whenComplete((pInteger, pThrowable) -> {
           if (pThrowable != null)
@@ -112,6 +118,8 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
             return;
           }
           esLintAnalyze(pFo);
+          if(pExecuteAfterFix != null)
+            pExecuteAfterFix.run();
         });
   }
 
