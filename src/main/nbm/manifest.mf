@@ -5,6 +5,11 @@ OpenIDE-Module-Display-Category: ADITO / ESLint
 OpenIDE-Module-Short-Description: ESLint Integration for ADITO Designer
 OpenIDE-Module-Long-Description: Integrates an static code analysis support based on ESLint
   <p style="font-weight: bold;">Changelog</p>
+  <p style="font-weight: bold;">v1.1.1</p>
+  <p style="margin-left: 10px; font-weight: bold;">MAJOR</p>
+  <ul>
+    <li>Fix: ESLint actions only work on the file that was opened last in the editor</li>
+  </ul>
   <p style="font-weight: bold;">v1.1.0</p>
   <p style="margin-left: 10px; font-weight: bold;">MAJOR</p>
     <ul>
