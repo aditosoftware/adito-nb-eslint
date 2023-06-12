@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import de.adito.aditoweb.nbm.eslint.api.IESLintExecutorFacade;
 import de.adito.aditoweb.nbm.nbide.nbaditointerface.cache.*;
 import de.adito.notification.INotificationFacade;
-import org.jetbrains.annotations.NotNull;
+import lombok.NonNull;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
@@ -39,7 +39,7 @@ public class ESLintErrorDescriptionProvider
    *
    * @param pFo the corresponding fileobject
    */
-  public void publishExistingErrors(@NotNull FileObject pFo)
+  public void publishExistingErrors(@NonNull FileObject pFo)
   {
     if (cache.has(pFo.getPath()))
     {
@@ -60,7 +60,7 @@ public class ESLintErrorDescriptionProvider
    * @param pResult     the ESLint analyzing result
    * @param pFileObject the corresponding fileobject
    */
-  public void publishErrors(@NotNull ESLintResult pResult, @NotNull FileObject pFileObject)
+  public void publishErrors(@NonNull ESLintResult pResult, @NonNull FileObject pFileObject)
   {
     EditorCookie ec = pFileObject.getLookup().lookup(EditorCookie.class);
     Document doc = ec != null ? ec.getDocument() : null;
@@ -104,7 +104,7 @@ public class ESLintErrorDescriptionProvider
     HintsController.setErrors(doc, getClass().getName(), allErrors);
   }
 
-  private static List<Fix> createFixes(@NotNull ESLintResult.Message pMessage, @NotNull FileObject pFileObject)
+  private static List<Fix> createFixes(@NonNull ESLintResult.Message pMessage, @NonNull FileObject pFileObject)
   {
     List<Fix> fixes = new ArrayList<>();
     if (pMessage.getFix() != null)
@@ -164,7 +164,7 @@ public class ESLintErrorDescriptionProvider
   {
     private final List<Fix> fixes;
 
-    public StaticFixList(@NotNull List<Fix> pFixes)
+    public StaticFixList(@NonNull List<Fix> pFixes)
     {
       fixes = pFixes;
     }
@@ -174,7 +174,7 @@ public class ESLintErrorDescriptionProvider
       return !fixes.isEmpty();
     }
 
-    @NotNull
+    @NonNull
     public List<Fix> getFixes()
     {
       return fixes;

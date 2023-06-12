@@ -1,6 +1,6 @@
 package de.adito.aditoweb.nbm.eslint.action;
 
-import org.jetbrains.annotations.NotNull;
+import lombok.NonNull;
 import org.netbeans.editor.BaseAction;
 import org.netbeans.modules.editor.NbEditorUtilities;
 import org.openide.filesystems.FileObject;
@@ -34,5 +34,5 @@ public abstract class ESLintAction extends BaseAction
    *
    * @param pFo the selected FileObject
    */
-  public abstract void actionPerformed(@NotNull JTextComponent pTextComponent, @NotNull FileObject pFo);
+  public abstract void actionPerformed(@NonNull JTextComponent pTextComponent, @NonNull FileObject pFo);
 }
