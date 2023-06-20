@@ -2,7 +2,7 @@ package de.adito.aditoweb.nbm.eslint.options;
 
 import de.adito.swing.*;
 import info.clearthought.layout.*;
-import org.jetbrains.annotations.NotNull;
+import lombok.NonNull;
 import org.openide.util.NbBundle;
 
 import javax.swing.*;
@@ -74,7 +74,7 @@ public class ESLintOptionsPanel extends JPanel implements Scrollable
     return false;
   }
 
-  public void setCurrent(@NotNull ESLintOptions pOptions)
+  public void setCurrent(@NonNull ESLintOptions pOptions)
   {
     options = pOptions;
     onSaveCheckBox.setSelected(pOptions.isOnSave());

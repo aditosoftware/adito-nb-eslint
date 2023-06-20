@@ -1,6 +1,6 @@
 package de.adito.aditoweb.nbm.eslint.options;
 
-import org.jetbrains.annotations.NotNull;
+import lombok.NonNull;
 import org.openide.util.NbPreferences;
 
 import java.util.Objects;
@@ -28,7 +28,7 @@ public class ESLintOptions
     return onSave;
   }
 
-  @NotNull
+  @NonNull
   public static ESLintOptions getInstance()
   {
     ESLintOptions options = new ESLintOptions();
@@ -36,7 +36,7 @@ public class ESLintOptions
     return options;
   }
 
-  public static void update(@NotNull ESLintOptions pOptions)
+  public static void update(@NonNull ESLintOptions pOptions)
   {
     PREFS.put("onSave", Boolean.toString(pOptions.isOnSave()));
   }

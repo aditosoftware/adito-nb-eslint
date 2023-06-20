@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import de.adito.aditoweb.nbm.eslint.api.IESLintExecutorFacade;
 import de.adito.aditoweb.nbm.nbide.nbaditointerface.javascript.node.*;
 import de.adito.notification.INotificationFacade;
+import lombok.NonNull;
 import org.jetbrains.annotations.*;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.project.*;
@@ -29,7 +30,7 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
   private ProgressHandle handle;
 
   @Override
-  public void esLintAnalyze(@NotNull FileObject pFo)
+  public void esLintAnalyze(@NonNull FileObject pFo)
   {
     esLintAnalyze(List.of(FileUtil.toFile(pFo)))
         .whenComplete((pESLintResults, pThrowable) -> {
@@ -60,8 +61,8 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
   }
 
   @Override
-  @NotNull
-  public CompletableFuture<ESLintResult[]> esLintAnalyze(@NotNull List<File> pFiles)
+  @NonNull
+  public CompletableFuture<ESLintResult[]> esLintAnalyze(@NonNull List<File> pFiles)
   {
     LOGGER.log(Level.INFO, () -> "ESLint Analyzing " + pFiles.stream()
         .map(File::getAbsolutePath)
@@ -101,13 +102,13 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
   }
 
   @Override
-  public void esLintFix(@NotNull FileObject pFo)
+  public void esLintFix(@NonNull FileObject pFo)
   {
     esLintFix(pFo, null);
   }
 
   @Override
-  public void esLintFix(@NotNull FileObject pFo, @Nullable Runnable pExecuteAfterFix)
+  public void esLintFix(@NonNull FileObject pFo, @Nullable Runnable pExecuteAfterFix)
   {
     esLintFix(List.of(FileUtil.toFile(pFo)))
         .whenComplete((pInteger, pThrowable) -> {
@@ -124,8 +125,8 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
   }
 
   @Override
-  @NotNull
-  public CompletableFuture<Integer> esLintFix(@NotNull List<File> pFiles)
+  @NonNull
+  public CompletableFuture<Integer> esLintFix(@NonNull List<File> pFiles)
   {
     LOGGER.log(Level.INFO, () -> "ESLint Fixing " + pFiles.stream()
         .map(File::getAbsolutePath)
@@ -154,7 +155,7 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
     return CompletableFuture.completedFuture(-1);
   }
 
-  private void _setup(@NotNull List<File> pFiles)
+  private void _setup(@NonNull List<File> pFiles)
   {
     if (handle == null)
     {
@@ -195,7 +196,7 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
     }
   }
 
-  @NotNull
+  @NonNull
   private INodeJSExecBase _getExecBase()
   {
     if (BaseUtilities.isWindows())

@@ -2,7 +2,7 @@ package de.adito.aditoweb.nbm.eslint.impl;
 
 import de.adito.aditoweb.nbm.eslint.api.IESLintExecutorFacade;
 import de.adito.aditoweb.nbm.eslint.options.ESLintOptions;
-import org.jetbrains.annotations.NotNull;
+import lombok.NonNull;
 import org.netbeans.api.actions.Savable;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
@@ -82,7 +82,7 @@ public class ESLintInit implements Runnable
     TopComponent.getRegistry().addPropertyChangeListener(tcListener);
   }
 
-  private static boolean canAnalyze(@NotNull FileObject pFo)
+  private static boolean canAnalyze(@NonNull FileObject pFo)
   {
     return "js".equalsIgnoreCase(pFo.getExt()) || "ts".equalsIgnoreCase(pFo.getExt());
   }

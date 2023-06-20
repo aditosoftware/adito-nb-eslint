@@ -1,6 +1,7 @@
 package de.adito.aditoweb.nbm.eslint.action;
 
 import de.adito.aditoweb.nbm.eslint.api.IESLintExecutorFacade;
+import lombok.NonNull;
 import org.jetbrains.annotations.*;
 import org.openide.awt.*;
 import org.openide.filesystems.FileObject;
@@ -36,7 +37,7 @@ public class ESLintAnalyzeAction extends ESLintAction
   }
 
   @Override
-  public void actionPerformed(@NotNull JTextComponent pTextComponent, @NotNull FileObject pFo)
+  public void actionPerformed(@NonNull JTextComponent pTextComponent, @NonNull FileObject pFo)
   {
     IESLintExecutorFacade.getInstance().esLintAnalyze(pFo);
   }

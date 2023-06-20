@@ -1,6 +1,6 @@
 package de.adito.aditoweb.nbm.eslint.action;
 
-import org.jetbrains.annotations.NotNull;
+import lombok.NonNull;
 import org.openide.awt.*;
 import org.openide.util.*;
 import org.openide.util.actions.Presenter;
@@ -59,7 +59,7 @@ public class ESLintMenuAction extends AbstractAction implements Presenter.Popup
     private final ESLintAction delegate;
     private ImageIcon icon;
 
-    private ActionWrapper(@NotNull ESLintAction pDelegate)
+    private ActionWrapper(@NonNull ESLintAction pDelegate)
     {
       delegate = pDelegate;
 

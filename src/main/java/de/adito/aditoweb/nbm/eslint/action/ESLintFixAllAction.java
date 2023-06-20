@@ -1,7 +1,7 @@
 package de.adito.aditoweb.nbm.eslint.action;
 
 import de.adito.aditoweb.nbm.eslint.api.IESLintExecutorFacade;
-import org.jetbrains.annotations.NotNull;
+import lombok.NonNull;
 import org.openide.awt.*;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
@@ -37,7 +37,7 @@ public class ESLintFixAllAction extends ESLintAction
   }
 
   @Override
-  public void actionPerformed(@NotNull JTextComponent pTextComponent, @NotNull FileObject pFo)
+  public void actionPerformed(@NonNull JTextComponent pTextComponent, @NonNull FileObject pFo)
   {
     //int caretPos = Optional.ofNullable(textComponent).map(JTextComponent::getCaret).map(Caret::getDot).orElse(0);
     //IESLintExecutorFacade.getInstance().esLintFix(pFo, () -> SwingUtilities.invokeLater(
