@@ -22,27 +22,23 @@
     <dependency>
       <groupId>de.adito.nb-modules</groupId>
       <artifactId>nb-adito-interface</artifactId>
-      <version>1.9.4-SNAPSHOT</version>
+      <version>1.9.8</version>
     </dependency>
     <dependency>
       <groupId>de.adito.nb-modules</groupId>
       <artifactId>de-adito-netbeans-utilities</artifactId>
-      <version>${netbeans.version}-1.9.1-SNAPSHOT</version>
+      <version>${netbeans.version}-1.9.5</version>
+      <exclusions>
+        <exclusion>
+          <groupId>de.adito.nbm.wrappers</groupId>
+          <artifactId>lwhttpclient</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>de.adito.nbm</groupId>
       <artifactId>de-adito-metrics-api</artifactId>
-      <version>${netbeans.version}-1.9.1-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.netbeans.api</groupId>
-      <artifactId>org-netbeans-modules-editor</artifactId>
-      <version>${netbeans.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.netbeans.api</groupId>
-      <artifactId>org-netbeans-modules-editor-lib</artifactId>
-      <version>${netbeans.version}</version>
+      <version>${netbeans.version}-1.9.1</version>
     </dependency>
     <dependency>
       <groupId>de.adito.util</groupId>
@@ -84,6 +80,11 @@
     <dependency>
       <groupId>org.netbeans.api</groupId>
       <artifactId>org-netbeans-modules-projectapi</artifactId>
+      <version>${netbeans.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.netbeans.api</groupId>
+      <artifactId>org-netbeans-modules-keyring</artifactId>
       <version>${netbeans.version}</version>
     </dependency>
     <dependency>
@@ -149,6 +150,16 @@
     <dependency>
       <groupId>org.netbeans.api</groupId>
       <artifactId>org-netbeans-api-progress</artifactId>
+      <version>${netbeans.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.netbeans.api</groupId>
+      <artifactId>org-netbeans-modules-editor</artifactId>
+      <version>${netbeans.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.netbeans.api</groupId>
+      <artifactId>org-netbeans-modules-editor-lib</artifactId>
       <version>${netbeans.version}</version>
     </dependency>
 
@@ -217,7 +228,7 @@
       <plugin>
         <groupId>org.apache.netbeans.utilities</groupId>
         <artifactId>nbm-maven-plugin</artifactId>
-        <version>4.5</version>
+        <version>4.7</version>
         <extensions>true</extensions>
         <configuration>
           <requiresRestart>true</requiresRestart>
