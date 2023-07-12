@@ -30,7 +30,7 @@ public class ESLintMenuAction extends AbstractAction implements Presenter.Popup
   @Override
   public void actionPerformed(ActionEvent e)
   {
-    throw new RuntimeException("not implemented");
+    throw new IllegalStateException("not implemented");
   }
 
   @Override
@@ -69,9 +69,9 @@ public class ESLintMenuAction extends AbstractAction implements Presenter.Popup
         if (resource != null)
           icon = new ImageIcon(ImageIO.read(resource));
       }
-      catch (IOException pE)
+      catch (IOException e)
       {
-        throw new RuntimeException(pE);
+        throw new IllegalStateException(e);
       }
     }
 

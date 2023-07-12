@@ -39,9 +39,6 @@ public class ESLintFixAllAction extends ESLintAction
   @Override
   public void actionPerformed(@NonNull JTextComponent pTextComponent, @NonNull FileObject pFo)
   {
-    //int caretPos = Optional.ofNullable(textComponent).map(JTextComponent::getCaret).map(Caret::getDot).orElse(0);
-    //IESLintExecutorFacade.getInstance().esLintFix(pFo, () -> SwingUtilities.invokeLater(
-    //    () -> Optional.ofNullable(textComponent).map(JTextComponent::getCaret).ifPresent(pCaret -> pCaret.setDot(caretPos))));
     IESLintExecutorFacade.getInstance().esLintFix(pFo);
   }
 }

@@ -1,5 +1,6 @@
 package de.adito.aditoweb.nbm.eslint.impl;
 
+import lombok.*;
 import org.netbeans.api.actions.Savable;
 import org.openide.loaders.DataObject;
 
@@ -8,6 +9,7 @@ import java.util.logging.*;
 /**
  * @author s.seemann, 16.05.2022
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SaveUtil
 {
 
@@ -18,15 +20,15 @@ public class SaveUtil
   {
     // Everything from 'Savable.REGISTRY'
     for (Savable savable : Savable.REGISTRY.lookupAll(Savable.class))
-      _save(savable);
+      save(savable);
 
     // Old implementations are probably only in 'DataObject.getRegistry()'.
     for (DataObject dataObject : DataObject.getRegistry().getModifiedSet())
       for (Savable savable : dataObject.getLookup().lookupAll(Savable.class))
-        _save(savable);
+        save(savable);
   }
 
-  private static void _save(Savable pSavable)
+  private static void save(Savable pSavable)
   {
     try
     {

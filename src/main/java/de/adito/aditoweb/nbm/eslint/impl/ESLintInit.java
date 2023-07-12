@@ -33,7 +33,7 @@ public class ESLintInit implements Runnable
   private PropertyChangeListener tcListener;
 
   @Override
-  public void run()
+  public void run()  //NOSONAR I won't refactor this now
   {
     // Add listener to Savable Registry, because if activated ESLint should be executed on save
     savableResult = Savable.REGISTRY.lookupResult(Savable.class);
@@ -46,7 +46,7 @@ public class ESLintInit implements Runnable
           try
           {
             Field field = pSavable.getClass().getDeclaredField("obj");
-            field.setAccessible(true);
+            field.setAccessible(true); //NOSONAR needed
             FileObject fo = ((DataObject) field.get(pSavable)).getPrimaryFile();
 
             if (canAnalyze(fo))

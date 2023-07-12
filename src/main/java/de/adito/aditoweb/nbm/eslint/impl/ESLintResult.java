@@ -34,7 +34,7 @@ public class ESLintResult implements Serializable
     private String ruleId;
     private int severity;
     private boolean fatal = false;
-    private String message;
+    private String message; // NOSONAR seems to be needed exactly as is
     private int line;
     private int column;
     private String nodeType;
