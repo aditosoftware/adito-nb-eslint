@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import de.adito.aditoweb.nbm.eslint.api.IESLintExecutorFacade;
 import de.adito.aditoweb.nbm.nbide.nbaditointerface.cache.*;
 import de.adito.notification.INotificationFacade;
-import lombok.NonNull;
+import lombok.*;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
@@ -26,7 +26,7 @@ public class ESLintErrorDescriptionProvider
   private ESLintErrorDescriptionProvider()
   {
     cache = Lookup.getDefault().lookup(ICacheProvider.class).get(ESLintErrorDescriptionProvider.class, ESLintErrorDescriptionProvider.class.getName(),
-                                                                 16 * 1024, 256 * 1024);
+                                                                 16 * 1024L, 256 * 1024L);
   }
 
   public static ESLintErrorDescriptionProvider getInstance()
@@ -124,60 +124,20 @@ public class ESLintErrorDescriptionProvider
           return null;
         }
       });
-
-      // currently no custom fixes
-      //  fixes.add(new Fix()
-      //  {
-      //    @Override
-      //    public String getText()
-      //    {
-      //      return "ESLint Fix this";
-      //    }
-      //
-      //    @Override
-      //    public ChangeInfo implement() throws BadLocationException, IOException
-      //    {
-      //      ESLintResult.Fix fix = pMessage.getFix();
-      //      int rangeStart = fix.getRangeStart();
-      //      int rangeEnd = fix.getRangeEnd();
-      //
-      //      // Netbeans ignores \r, ESLint not => Offset must be adjusted
-      //      if (pFileObject.asText().contains("\r\n"))
-      //      {
-      //        rangeStart = rangeStart - pMessage.getLine() + 1;
-      //        rangeEnd = rangeEnd - pMessage.getLine() + 1;
-      //      }
-      //
-      //      doc.remove(rangeStart, rangeEnd - rangeStart);
-      //      doc.insertString(rangeStart, fix.getText(), null);
-      //
-      //      // If something has changed (e. g. text inserted), the offsets are invalid
-      //      // what should happen?
-      //      return null;
-      //    }
-      //  });
     }
     return fixes;
   }
 
+  @RequiredArgsConstructor
   public static class StaticFixList implements LazyFixList
   {
+    @Getter
+    @NonNull
     private final List<Fix> fixes;
-
-    public StaticFixList(@NonNull List<Fix> pFixes)
-    {
-      fixes = pFixes;
-    }
 
     public boolean probablyContainsFixes()
     {
       return !fixes.isEmpty();
-    }
-
-    @NonNull
-    public List<Fix> getFixes()
-    {
-      return fixes;
     }
 
     public boolean isComputed()
@@ -187,10 +147,12 @@ public class ESLintErrorDescriptionProvider
 
     public void addPropertyChangeListener(PropertyChangeListener l)
     {
+      // not needed
     }
 
     public void removePropertyChangeListener(PropertyChangeListener l)
     {
+      // not needed
     }
   }
 }

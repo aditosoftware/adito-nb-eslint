@@ -5,7 +5,7 @@ import de.adito.aditoweb.nbm.eslint.api.IESLintExecutorFacade;
 import de.adito.aditoweb.nbm.nbide.nbaditointerface.javascript.node.*;
 import de.adito.notification.INotificationFacade;
 import lombok.NonNull;
-import org.jetbrains.annotations.*;
+import org.jetbrains.annotations.Nullable;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.project.*;
 import org.openide.filesystems.*;
@@ -37,7 +37,7 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
           if (pThrowable != null)
           {
             INotificationFacade.INSTANCE.error(pThrowable);
-            _cleanup();
+            cleanup();
             return;
           }
 
@@ -55,7 +55,7 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
           }
           finally
           {
-            _cleanup();
+            cleanup();
           }
         });
   }
@@ -70,15 +70,15 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
 
     try
     {
-      _setup(pFiles);
+      setup(pFiles);
 
       ByteArrayOutputStream output = new ByteArrayOutputStream();
       List<String> params = pFiles.stream()
           .map(File::getAbsolutePath)
           .collect(Collectors.toList());
       params.add(0, "--format=json");
-      return executor.executeAsync(nodeJsEnv, _getExecBase(), output, null, null, params.toArray(new String[0]))
-          .thenApplyAsync(((pInteger) -> {
+      return executor.executeAsync(nodeJsEnv, getExecBase(), output, null, null, params.toArray(new String[0]))
+          .thenApplyAsync((pInteger -> {
             try
             {
               // the first line is the command, this line should be removed
@@ -89,14 +89,14 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
             }
             finally
             {
-              _cleanup();
+              cleanup();
             }
           }));
     }
     catch (Exception pE)
     {
       INotificationFacade.INSTANCE.error(pE);
-      _cleanup();
+      cleanup();
     }
     return CompletableFuture.completedFuture(new ESLintResult[0]);
   }
@@ -115,7 +115,7 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
           if (pThrowable != null)
           {
             INotificationFacade.INSTANCE.error(pThrowable);
-            _cleanup();
+            cleanup();
             return;
           }
           esLintAnalyze(pFo);
@@ -134,28 +134,28 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
 
     try
     {
-      _setup(pFiles);
+      setup(pFiles);
 
       List<String> params = pFiles.stream()
           .map(File::getAbsolutePath)
           .collect(Collectors.toList());
       params.add(0, "--fix");
-      return executor.executeAsync(nodeJsEnv, _getExecBase(), new ByteArrayOutputStream(), null,
+      return executor.executeAsync(nodeJsEnv, getExecBase(), new ByteArrayOutputStream(), null,
                                    null, params.toArray(new String[0]))
           .thenApplyAsync(pInteger -> {
-            _cleanup();
+            cleanup();
             return pInteger;
           });
     }
     catch (Exception pE)
     {
       INotificationFacade.INSTANCE.error(pE);
-      _cleanup();
+      cleanup();
     }
     return CompletableFuture.completedFuture(-1);
   }
 
-  private void _setup(@NonNull List<File> pFiles)
+  private void setup(@NonNull List<File> pFiles)
   {
     if (handle == null)
     {
@@ -186,7 +186,7 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
     nodeJsEnv = provider.current().blockingFirst().get(); // NOSONAR the check is in the if above
   }
 
-  private void _cleanup()
+  private void cleanup()
   {
     if (handle != null)
     {
@@ -197,7 +197,7 @@ public class ESLintExecutorFacadeImpl implements IESLintExecutorFacade
   }
 
   @NonNull
-  private INodeJSExecBase _getExecBase()
+  private INodeJSExecBase getExecBase()
   {
     if (BaseUtilities.isWindows())
       return INodeJSExecBase.binary("eslint.cmd");
